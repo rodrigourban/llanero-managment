@@ -1,0 +1,33 @@
+.actionContainer {
+    display: flex;
+}
+
+.actionBtn {
+    width: 25px;
+    height: 25px;
+    border-radius: 2px;
+}
+.actionBtn i {
+    width: 25px;
+    height: 25px;
+    border: none;
+}
+
+.actionBtn:hover {
+    cursor: pointer;
+}
+
+.actionBtn:hover span {
+    display: block;
+}
+
+.actionBtn span {
+  display: none;
+  position: absolute;
+  margin: -25px 0px 0px -50px;
+  z-index: 2;
+  background-color: black;
+  color: white;
+  padding: 2px;
+  border-radius: 4px;
+}

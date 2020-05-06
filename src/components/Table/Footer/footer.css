@@ -1,0 +1,23 @@
+.tableFooter {
+    align-self: flex-end;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin: 16px 0px 10px 0px;
+    font-size: 0.9rem;
+}
+
+.footerElement {
+    margin: 0px 16px;
+}
+
+.footerElement input {
+    width: 10%;
+}
+
+.footerElement button {
+    outline: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}

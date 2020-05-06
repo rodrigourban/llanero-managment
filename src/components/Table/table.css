@@ -1,0 +1,42 @@
+.tContainer {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    border-radius: 4px;
+}
+
+.tableContainer {
+    overflow-x: auto;   
+}
+.tableContainer::-webkit-scrollbar-track {
+    background-color: inherit;
+}
+.tableContainer::-webkit-scrollbar {
+    width: 5px;
+    background-color: inherit;
+}
+.tableContainer::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.styledTable {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+    font-size: 0.9rem;
+}
+
+.styledTable td {
+    max-width: 180px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 0px 16px;
+    font-weight: 400;
+}
+.styledTable img {
+    width: 100px;
+}

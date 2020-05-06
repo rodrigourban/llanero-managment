@@ -1,0 +1,47 @@
+@import "~antd/dist/antd.css";
+
+.footer-order {
+  display: flex;
+  justify-content: flex-end;
+}
+.fixHeight {
+  line-height: 0.6;
+}
+.floatingBtn {
+  position: absolute;
+  padding: 8px;
+  height: 50px;
+  width: 50px;
+  bottom: 30px;
+  right: 30px;
+  border-radius: 50%;
+  background-color: #6c757d;
+  font-size: 2rem;
+  text-align: center;
+  color: white;
+  line-height: 1.7rem;
+  &:hover {
+    cursor: pointer;
+  }
+}
+.table-search {
+  width: 30%;
+  margin-left: 70%;
+}
+.footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 767px) {
+  .ant-table-body {
+    overflow-x: scroll;
+  }
+  .table-search {
+    width: 100%;
+    margin-left: 0;
+  }
+  .footer-right {
+    margin-top: 20px;
+  }
+}

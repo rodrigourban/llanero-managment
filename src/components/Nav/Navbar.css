@@ -1,0 +1,78 @@
+@import '~antd/dist/antd.css';
+
+.menu {
+  padding: 0 20px;
+  border-bottom: solid 1px #e8e8e8;
+  overflow: hidden;
+  box-shadow: 0 0 30px #f3f1f1;
+}
+
+.menuLogo {
+  width: 150px;
+  float: left;
+}
+
+.menuLogo a {
+  display: inline-block;
+  padding-top: 5px;
+}
+
+.menuContainer .ant-menu-item {
+ padding: 0px 5px;
+}
+
+.menuContainer .ant-menu-item a,
+.menuContainer .ant-menu-submenu-title a {
+  padding: 10px 15px;
+}
+
+.menuContainer .ant-menu-horizontal {
+  border-bottom: none;
+}
+
+.menuContainer .menuLeft {
+  float: left;
+}
+
+.menuContainer .menuRight {
+  float: right;
+}
+
+.menuMobileBtn {
+  float: right;
+  margin-top: 15px;
+  display: none !important; /* use of important to overwrite ant-btn */
+}
+
+.menuDrawer .ant-drawer-body {
+  padding: 0 !important;
+}
+
+/* align header of Drawer with header of page */
+.menuDrawer .ant-drawer-header {
+  padding: 14px 24px !important;
+}
+
+@media (max-width: 767px) {
+  .menuMobileBtn {
+    display: inline-block !important;
+  }
+
+  .menuLeft,
+  .menuRight {
+    display: none;
+  }
+
+  .menuLogo a {
+    margin-left: -20px;
+  }
+
+  .menuContainer .ant-menu-item,
+  .menuContainer .ant-menu-submenu-title {
+    padding: 1px 20px;
+  }
+
+  .menuLogo a {
+    padding: 10px 20px;
+  }
+}
