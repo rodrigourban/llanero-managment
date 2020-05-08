@@ -2,7 +2,7 @@ from inventory.models import Article, Sale, Stock, Location
 from django.contrib.auth import get_user_model
 import csv
 import datetime
-import json
+import pickle
 
 User = get_user_model()
 
@@ -13,8 +13,8 @@ def run():
         # article - model: id, name, sku, suggested_price, image, link
         # created_at, updated_at, created_by
         data_json = {}
-        with open('articlesid.txt', 'r') as json_file:
-            data_json = json.load(json_file)
+        with open('old_data/articlesid.dictionary', 'rb') as json_file:
+            data_json = pickle.load(json_file)
         with open('old_data/venta.csv', newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for line in reader:

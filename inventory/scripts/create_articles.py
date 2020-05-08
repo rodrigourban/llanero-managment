@@ -2,7 +2,7 @@ from inventory.models import Article, Location, Stock
 from django.contrib.auth import get_user_model
 import csv
 import datetime
-import json
+import pickle
 
 User = get_user_model()
 
@@ -61,8 +61,8 @@ def run():
                         created_by=user, updated_by=user,
                     )
                     print(new_article_data)
-            with open('articlesid.txt', 'w') as outfile:
-                json.dumps(data_json, outfile)
+            with open('old_data/articlesid.dictionary', 'wb') as outfile:
+                pickle.dump(data_json, outfile)
 
     except Exception as error:
         # if the're a problem anywhere, you wanna know about it
