@@ -77,6 +77,7 @@ const Orders = (props) => {
   const changeQueryParams = (field, value) => {
     switch (field) {
       case "search":
+        dispatch(apiActions.updatePagination(null));
         dispatch(apiActions.updateFilter(value));
         break;
       case "pagination":

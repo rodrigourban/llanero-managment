@@ -149,7 +149,7 @@ const Inventory = (props) => {
   const changeQueryParams = (field, value) => {
     switch (field) {
       case "search":
-        dispatch(apiActions.updatePagination(1));
+        dispatch(apiActions.updatePagination(null));
         dispatch(apiActions.updateFilter(value));
         break;
       case "pagination":
