@@ -15,7 +15,7 @@ def run():
             if stock:
                 res = stock
             print("el stock es ", res)
-            article.stock = res
+            article.quantity = res
             article.save()
     except Exception as error:
         # if the're a problem anywhere, you wanna know about it
