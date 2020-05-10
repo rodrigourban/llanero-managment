@@ -8,13 +8,16 @@ const NewStock = (props) => {
   const payload = useSelector((state) => state.modal.payload);
   const dataList = useSelector((state) => state.api.dataList);
   const token = useSelector((state) => state.auth.token);
+  const pagination = useSelector((state) => state.api.pagination);
+  const order = useSelector((state) => state.api.order);
+  const filter = useSelector((state) => state.api.filter);
   const [data, setData] = React.useState(null);
   const dispatch = useDispatch();
 
   const handleSubmit = (values) => {
     if (payload) {
       const data = { ...values, article: payload.id };
-      dispatch(createStock(data, token));
+      dispatch(createStock(data, token, {pagination, order, filter}));
       dispatch(modalClose());
     }
   };

@@ -149,6 +149,7 @@ const Inventory = (props) => {
   const changeQueryParams = (field, value) => {
     switch (field) {
       case "search":
+        dispatch(apiActions.updatePagination(1));
         dispatch(apiActions.updateFilter(value));
         break;
       case "pagination":
@@ -163,7 +164,7 @@ const Inventory = (props) => {
   };
 
   React.useEffect(() => {
-    dispatch(apiActions.getDataList(0, token, 0, filter, pagination, order));
+    dispatch(apiActions.getDataList(0, token, 0, {pagination, order, filter}));
   }, [filter, pagination, order]);
 
   const handleTableChange = (paginate, filters, sorter) => {
@@ -203,7 +204,7 @@ const Inventory = (props) => {
           key="suggested_price"
           sorter={true}
         />
-        <Table.Column title="Stock" dataIndex="quantity" key="quantity" />
+        <Table.Column title="Stock" dataIndex="quantity" key="quantity" sorter={true} />
         <Table.Column
           title="Imagen"
           dataIndex="image"

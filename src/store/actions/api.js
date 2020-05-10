@@ -20,23 +20,19 @@ export const getDataList = (
   id,
   token,
   collectionType,
-  filter,
-  pagination,
-  order,
-  orderType
+  pageConfig
 ) => {
-  console.log(id, token, filter, order, orderType);
   return (dispatch) => {
     dispatch(apiStart());
     const requestConfig = {
       headers: { Authorization: `Token ${token}` },
     };
     let queryParams = "";
-    if (filter || pagination || order || orderType) {
+    if (pageConfig.filter || pageConfig.pagination || pageConfig.order ) {
       // const queryParams = `${filter ? `search=${filter}` : ""}`;
-      queryParams = `${filter ? `search=${filter}&` : ""}${
-        pagination ? `page=${pagination}&` : ""
-      }${order ? `order=${order}` : ""}`;
+      queryParams = `${pageConfig.filter ? `search=${pageConfig.filter}&` : ""}${
+        pageConfig.pagination ? `page=${pageConfig.pagination}&` : ""
+      }${pageConfig.order ? `order=${pageConfig.order}` : ""}`;
     }
     const urlType = TYPES[collectionType];
     const url =
@@ -60,7 +56,7 @@ export const getDataList = (
   };
 };
 
-export const createArticle = (payload, token) => {
+export const createArticle = (payload, token, pageConfig) => {
   return (dispatch) => {
     const requestConfig = {
       headers: {
@@ -71,7 +67,7 @@ export const createArticle = (payload, token) => {
     axios
       .post(`${config.url.API_URL}/api/articles/`, payload, requestConfig)
       .then((res) => {
-        dispatch(getDataList(0, token, 0));
+        dispatch(getDataList(0, token, 0, pageConfig));
       })
 
       .catch((error) => {
@@ -80,7 +76,7 @@ export const createArticle = (payload, token) => {
   };
 };
 
-export const createStock = (payload, token) => {
+export const createStock = (payload, token, pageConfig) => {
   return (dispatch) => {
     const requestConfig = {
       headers: {
@@ -90,7 +86,7 @@ export const createStock = (payload, token) => {
     axios
       .post(`${config.url.API_URL}/api/stocks/`, payload, requestConfig)
       .then((res) => {
-        dispatch(getDataList(0, token, 0));
+        dispatch(getDataList(0, token, 0, pageConfig));
       })
 
       .catch((error) => {
@@ -99,7 +95,7 @@ export const createStock = (payload, token) => {
   };
 };
 
-export const createSale = (payload, token) => {
+export const createSale = (payload, token, pageConfig) => {
   return (dispatch) => {
     const requestConfig = {
       headers: {
@@ -109,7 +105,7 @@ export const createSale = (payload, token) => {
     axios
       .post(`${config.url.API_URL}/api/sales/`, payload, requestConfig)
       .then((res) => {
-        dispatch(getDataList(0, token, 0));
+        dispatch(getDataList(0, token, 0, pageConfig));
       })
 
       .catch((error) => {
@@ -135,7 +131,7 @@ export const createOrder = (payload, token) => {
   };
 };
 
-export const createUser = (payload, token) => {
+export const createUser = (payload, token, pageConfig) => {
   return (dispatch) => {
     const requestConfig = {
       headers: { Authorization: `Token ${token}` },
@@ -147,7 +143,7 @@ export const createUser = (payload, token) => {
         requestConfig
       )
       .then((res) => {
-        dispatch(getDataList(0, token, 4));
+        dispatch(getDataList(0, token, 4, pageConfig));
       })
       .catch((error) => {
         dispatch(apiFail(error.response.data));
@@ -155,7 +151,7 @@ export const createUser = (payload, token) => {
   };
 };
 
-export const transferStock = (payload, token) => {
+export const transferStock = (payload, token, pageConfig) => {
   return (dispatch) => {
     const requestConfig = {
       headers: { Authorization: `Token ${token}` },
@@ -163,7 +159,7 @@ export const transferStock = (payload, token) => {
     axios
       .post(`${config.url.API_URL}/api/transfer_stock`, payload, requestConfig)
       .then((res) => {
-        dispatch(getDataList(0, token, 0));
+        dispatch(getDataList(0, token, 0, pageConfig));
       })
       .catch((error) => {
         dispatch(apiFail(error.response.data));
@@ -171,7 +167,7 @@ export const transferStock = (payload, token) => {
   };
 };
 
-export const updateElement = (operationType, articleID, payload, token) => {
+export const updateElement = (operationType, articleID, payload, token, pageConfig) => {
   return (dispatch) => {
     const requestConfig = {
       headers: { Authorization: `Token ${token}` },
@@ -184,7 +180,7 @@ export const updateElement = (operationType, articleID, payload, token) => {
         requestConfig
       )
       .then((res) => {
-        dispatch(getDataList(0, token, operationType));
+        dispatch(getDataList(0, token, operationType, pageConfig));
       })
 
       .catch((error) => {

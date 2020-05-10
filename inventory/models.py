@@ -18,7 +18,8 @@ class Article(models.Model):
         max_digits=15, decimal_places=2, default=0)
     status = models.BooleanField(default=True)
     image = models.ImageField(upload_to='images', default='default.png')
-    link = models.CharField(max_length=200, default="")
+    link = models.CharField(max_length=200, default="", blank=True)
+    quantity = models.IntegerField(blank=True, default=0)
     created_at = models.DateTimeField(default=datetime.now, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
@@ -35,7 +36,8 @@ class Location(models.Model):
     Location model
     Defines the attributes of the location of each Article
     """
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="article_location")
+    article = models.ForeignKey(
+        Article, on_delete=models.CASCADE, related_name="article_location")
     body = models.CharField(max_length=200)
     optional = models.BooleanField(default=False)
     status = models.BooleanField(default=True)

@@ -9,12 +9,15 @@ const Confirm = (props) => {
   const payload = useSelector((state) => state.modal.payload);
   const token = useSelector((state) => state.auth.token);
   const error = useSelector((state) => state.api.error);
+  const pagination = useSelector((state) => state.api.pagination);
+  const order = useSelector((state) => state.api.order);
+  const filter = useSelector((state) => state.api.filter);
 
   const deleteArticle = () => {
     const newState =
       payload.type != 4 ? { status: false } : { is_active: false };
     dispatch(
-      apiActions.updateElement(payload.type, payload.id, newState, token)
+      apiActions.updateElement(payload.type, payload.id, newState, token, {pagination, order, filter})
     );
     dispatch(modalClose());
     if (!error) message.success("Se ha borrado el articulo exitosamente", 1);

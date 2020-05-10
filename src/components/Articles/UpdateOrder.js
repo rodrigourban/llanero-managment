@@ -8,6 +8,9 @@ const UpdateOrder = () => {
   const payload = useSelector((state) => state.modal.payload);
   const token = useSelector((state) => state.auth.token);
   const dispatch = useDispatch();
+  const pagination = useSelector((state) => state.api.pagination);
+  const order = useSelector((state) => state.api.order);
+  const filter = useSelector((state) => state.api.filter);
 
   const handleSubmit = (values) => {
     dispatch(updateElement(2, payload.id, values, token));

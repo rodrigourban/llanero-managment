@@ -13,6 +13,9 @@ const ArticleForm = () => {
   const error = useSelector((state) => state.api.error);
   const token = useSelector((state) => state.auth.token);
   const dataList = useSelector((state) => state.api.dataList);
+  const pagination = useSelector((state) => state.api.pagination);
+  const order = useSelector((state) => state.api.order);
+  const filter = useSelector((state) => state.api.filter);
 
   const props = {
     beforeUpload(file) {
@@ -23,6 +26,9 @@ const ArticleForm = () => {
 
   if (article && !data) {
     let formatedData = { ...dataList.results[article.key] };
+    if ('image' in formatedData) {
+      delete formatedData.image
+    }
     const location = formatedData.location[0].body;
     const optional_location = formatedData.location[1].body;
     delete formatedData.location;
@@ -44,12 +50,15 @@ const ArticleForm = () => {
     }
     if (article) {
       //Update
-      console.log("Update: ", article.id, values, token);
-      dispatch(apiActions.updateElement(0, article.id, values, token));
+      if (file) {
+        dispatch(apiActions.updateElement(0, article.id, formData, token, {pagination, order, filter}));
+      } else {
+        dispatch(apiActions.updateElement(0, article.id, values, token, {pagination, order, filter}));
+      }
       dispatch(modalClose());
     } else {
       //Create
-      dispatch(apiActions.createArticle(formData, token));
+      dispatch(apiActions.createArticle(formData, token, {pagination, order, filter}));
       dispatch(modalClose());
     }
   };
@@ -135,22 +144,18 @@ const ArticleForm = () => {
       <Form.Item label="Link" name="link">
         <Input></Input>
       </Form.Item>
-
-      {article ? null : (
-        <Form.Item
-          name="image"
-          label="Image"
-          valuePropName="fileList"
-          getValueFromEvent={normFile}
-        >
-          <Upload {...props} multiple={false}>
-            <Button>
-              <UploadOutlined /> Click para subir imagen
-            </Button>
-          </Upload>
-        </Form.Item>
-      )}
-
+      <Form.Item
+        name="image"
+        label="Image"
+        valuePropName="fileList"
+        getValueFromEvent={normFile}
+      >
+        <Upload {...props} multiple={false}>
+          <Button>
+            <UploadOutlined /> {article ? 'Cargar nueva imagen' : 'Click para subir imagen'}
+          </Button>
+        </Upload>
+      </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" block>
           {article ? "Editar" : "Crear"}

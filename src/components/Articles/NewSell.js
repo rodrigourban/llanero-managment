@@ -13,6 +13,9 @@ const NewSell = () => {
   const [quantity, setQuantity] = React.useState(null);
   const [data, setData] = React.useState(null);
   const dispatch = useDispatch();
+  const pagination = useSelector((state) => state.api.pagination);
+  const order = useSelector((state) => state.api.order);
+  const filter = useSelector((state) => state.api.filter);
 
   if (dataList.results[payload.key] && !data) {
     let formatedData = [];
@@ -39,7 +42,8 @@ const NewSell = () => {
           {
             article: payload.id,
           },
-          token
+          token,
+          {pagination, order, filter}
         )
       );
     }

@@ -2,6 +2,8 @@ from django.shortcuts import render
 import logging
 import copy
 import datetime
+import operator
+from functools import reduce
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -11,7 +13,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from django.core.exceptions import ValidationError
-from django.db.models import Sum, F, DecimalField, IntegerField
+from django.db.models import Sum, F, DecimalField, IntegerField, Q
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from .models import Article, Stock, Sale, Order, Location
@@ -19,6 +21,14 @@ from .models import Article, Stock, Sale, Order, Location
 
 views_logger = logging.getLogger(__name__)
 User = get_user_model()
+
+
+def search_many_words(words):
+    print(words)
+    queryset = Article.objects.filter(
+        reduce(operator.and_, (Q(name__contains=x) for x in words)))
+    print(queryset.count())
+    return queryset
 
 
 class ArticleViewSet(viewsets.ModelViewSet):
@@ -32,14 +42,14 @@ class ArticleViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
 
     def get_queryset(self):
-        search = self.request.query_params.get('search', "")
-        orderField = self.request.query_params.get('order', 'created_at')
+        search = self.request.query_params.get('search', None)
+        orderField = self.request.query_params.get('order', 'name')
         orderType = self.request.query_params.get('type', "")
-        queryset = Article.objects.filter(status=True, name__icontains=search).order_by(
-            '%s%s' % (orderType, orderField)) | Article.objects.filter(status=True, sku__icontains=search).order_by(
-            '%s%s' % (orderType, orderField)) | Article.objects.filter(status=True, created_at__icontains=search).order_by(
-            '%s%s' % (orderType, orderField))
-        return queryset
+        if search is not None:
+            queryset = search_many_words(search.split())
+        else:
+            queryset = Article.objects.filter(status=True)
+        return queryset.order_by('%s%s' % (orderType, orderField))
 
     def create(self, request, *args, **kwargs):
         try:
@@ -134,6 +144,9 @@ class StockViewSet(viewsets.ModelViewSet):
             views_logger.info("%s", payload)
             payload['created_by'] = self.request.user.pk
             payload['updated_by'] = self.request.user.pk
+            article = Article.objects.get(pk=payload['article'])
+            article.stock = payload['quantity']
+            article.save()
             serializerStock = StockSerializer(data=payload)
             serializerStock.is_valid(raise_exception=True)
             serializerStock.save()
@@ -212,6 +225,9 @@ class SaleViewSet(viewsets.ModelViewSet):
                     sale_serializer.save()
                     stock_serializer.save()
                     i += 1
+                article = Article.objects.get(pk=payload['article'])
+                article.stock = res - quantity
+                article.save()
             else:
                 views_logger.info("CANT CREATE SALE, NOT ENOUGH STOCK")
                 return Response({'message': 'No hay stock suficiente.'}, status.HTTP_400_BAD_REQUEST)
@@ -230,7 +246,8 @@ class SaleViewSet(viewsets.ModelViewSet):
             sale = Sale.objects.get(id=pk)
             if 'returnStock' in payload.keys():
                 # do something
-                location = Location.objects.get(article=sale.stock.article, optional=False)
+                location = Location.objects.get(
+                    article=sale.stock.article, optional=False)
                 loc_serializer = StockSerializer(data={
                     "article": sale.stock.article.pk,
                     "location": location.pk,
@@ -379,8 +396,10 @@ class getEarnings(APIView):
             dateTo = self.request.data.get('dateTo', None)
             dateType = self.request.data.get('dateType', None)
             current_timezone = timezone.get_current_timezone()
-            date_from = current_timezone.localize(datetime.datetime.strptime(dateFrom, '%Y-%m-%d'))
-            date_to = current_timezone.localize(datetime.datetime.strptime(dateTo, '%Y-%m-%d'))
+            date_from = current_timezone.localize(
+                datetime.datetime.strptime(dateFrom, '%Y-%m-%d'))
+            date_to = current_timezone.localize(
+                datetime.datetime.strptime(dateTo, '%Y-%m-%d'))
             date_to += datetime.timedelta(days=1)
             sales = Sale.objects.filter(
                 status=True, created_at__gte=date_from, created_at__lte=date_to)
@@ -425,7 +444,6 @@ class transferStock(APIView):
             origin = self.request.data.get('origin', None)
             destination = self.request.data.get('destination', None)
             quantity = self.request.data.get('quantity', None)
-            print("args %s %s %s" % (origin,destination,quantity))
             # Add in destination
             stock_origin = Stock.objects.filter(location=origin, status=True)
             destination_serializer = StockSerializer(data={
@@ -462,4 +480,3 @@ class transferStock(APIView):
         except ValidationError as error:
             views_logger.error("Error in transfer stock %s" % error)
             return Response({'message': error.message}, status.HTTP_400_BAD_REQUEST)
-

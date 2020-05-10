@@ -91,7 +91,7 @@ const Orders = (props) => {
   };
 
   React.useEffect(() => {
-    dispatch(apiActions.getDataList(0, token, 2, filter, pagination, order));
+    dispatch(apiActions.getDataList(0, token, 2, {pagination, order, filter}));
   }, [filter, pagination, order]);
 
   const handleTableChange = (paginate, filters, sorter) => {

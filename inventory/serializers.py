@@ -35,7 +35,6 @@ class ArticleSerializer(serializers.ModelSerializer):
         return result
 
     def get_cost(self, obj):
-        print("Get cost")
         stock = Stock.objects.filter(
             article=obj.pk, status=True).order_by('-created_at')
         count = 0

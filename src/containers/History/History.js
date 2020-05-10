@@ -96,7 +96,7 @@ const History = (props) => {
   };
 
   React.useEffect(() => {
-    dispatch(apiActions.getDataList(0, token, 3, filter, pagination, order));
+    dispatch(apiActions.getDataList(0, token, 3, {pagination, order, filter}));
   }, [filter, pagination, order]);
 
   const handleTableChange = (paginate, filters, sorter) => {
