@@ -12,6 +12,9 @@ const TransferStock = () => {
   const token = useSelector((state) => state.auth.token);
   const [quantity, setQuantity] = React.useState(null);
   const [data, setData] = React.useState(null);
+  const pagination = useSelector((state) => state.api.pagination);
+  const order = useSelector((state) => state.api.order);
+  const filter = useSelector((state) => state.api.filter);
   const dispatch = useDispatch();
 
   if (dataList.results[payload.key] && !data) {
@@ -33,7 +36,7 @@ const TransferStock = () => {
       destination,
     };
     console.log(formatedValues);
-    dispatch(transferStock(formatedValues, token));
+    dispatch(transferStock(formatedValues, token, {pagination, order, filter}));
     dispatch(modalClose());
   };
 

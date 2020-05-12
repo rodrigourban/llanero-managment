@@ -26,7 +26,7 @@ User = get_user_model()
 def search_many_words(words):
     print(words)
     queryset = Article.objects.filter(
-        reduce(operator.and_, (Q(name__contains=x) for x in words)))
+        reduce(operator.and_, (Q(name__icontains=x) for x in words)))
     print(queryset.count())
     return queryset
 
@@ -145,7 +145,7 @@ class StockViewSet(viewsets.ModelViewSet):
             payload['created_by'] = self.request.user.pk
             payload['updated_by'] = self.request.user.pk
             article = Article.objects.get(pk=payload['article'])
-            article.stock = payload['quantity']
+            article.quantity = payload['quantity']
             article.save()
             serializerStock = StockSerializer(data=payload)
             serializerStock.is_valid(raise_exception=True)
@@ -174,9 +174,11 @@ class SaleViewSet(viewsets.ModelViewSet):
             orderField = orderField[1:]
         if (orderField == 'name' or orderField == '-name'):
             orderField = 'stock__article__name'
+        print(orderField)
         queryset = Sale.objects.filter(quantity__icontains=search).order_by(
             '%s%s' % (orderType, orderField)) | Sale.objects.filter(price__icontains=search).order_by(
             '%s%s' % (orderType, orderField)) | Sale.objects.filter(created_at__icontains=search).order_by(
+            '%s%s' % (orderType, orderField)) | Sale.objects.filter(stock__article__name__icontains=search).order_by(
             '%s%s' % (orderType, orderField))
         return queryset
 
@@ -225,8 +227,10 @@ class SaleViewSet(viewsets.ModelViewSet):
                     sale_serializer.save()
                     stock_serializer.save()
                     i += 1
-                article = Article.objects.get(pk=payload['article'])
-                article.stock = res - quantity
+                article = Article.objects.get(pk=self.request.data['article'])
+                new_quantity = Stock.objects.filter(article=article, status=True).aggregate(
+                    total_stock=Sum('quantity'))['total_stock']
+                article.quantity = new_quantity
                 article.save()
             else:
                 views_logger.info("CANT CREATE SALE, NOT ENOUGH STOCK")

@@ -28,11 +28,13 @@ export const getDataList = (
       headers: { Authorization: `Token ${token}` },
     };
     let queryParams = "";
-    if (pageConfig.filter || pageConfig.pagination || pageConfig.order ) {
-      // const queryParams = `${filter ? `search=${filter}` : ""}`;
-      queryParams = `${pageConfig.filter ? `search=${pageConfig.filter}&` : ""}${
-        pageConfig.pagination ? `page=${pageConfig.pagination}&` : ""
-      }${pageConfig.order ? `order=${pageConfig.order}` : ""}`;
+    if (!!pageConfig) {
+      if (pageConfig.filter || pageConfig.pagination || pageConfig.order ) {
+        // const queryParams = `${filter ? `search=${filter}` : ""}`;
+        queryParams = `${pageConfig.filter ? `search=${pageConfig.filter}&` : ""}${
+          pageConfig.pagination ? `page=${pageConfig.pagination}&` : ""
+        }${pageConfig.order ? `order=${pageConfig.order}` : ""}`;
+      }
     }
     const urlType = TYPES[collectionType];
     const url =
@@ -71,7 +73,7 @@ export const createArticle = (payload, token, pageConfig) => {
       })
 
       .catch((error) => {
-        dispatch(apiFail(error.response.data));
+        dispatch(apiFail(error.response));
       });
   };
 };
@@ -90,7 +92,7 @@ export const createStock = (payload, token, pageConfig) => {
       })
 
       .catch((error) => {
-        dispatch(apiFail(error.response.data));
+        dispatch(apiFail(error.response));
       });
   };
 };
@@ -107,9 +109,8 @@ export const createSale = (payload, token, pageConfig) => {
       .then((res) => {
         dispatch(getDataList(0, token, 0, pageConfig));
       })
-
       .catch((error) => {
-        dispatch(apiFail(error.response.data));
+        dispatch(apiFail(error.response));
       });
   };
 };
@@ -126,7 +127,7 @@ export const createOrder = (payload, token) => {
         console.log(res);
       })
       .catch((error) => {
-        dispatch(apiFail(error.response.data));
+        dispatch(apiFail(error.response));
       });
   };
 };
@@ -146,7 +147,7 @@ export const createUser = (payload, token, pageConfig) => {
         dispatch(getDataList(0, token, 4, pageConfig));
       })
       .catch((error) => {
-        dispatch(apiFail(error.response.data));
+        dispatch(apiFail(error.response));
       });
   };
 };
@@ -162,7 +163,7 @@ export const transferStock = (payload, token, pageConfig) => {
         dispatch(getDataList(0, token, 0, pageConfig));
       })
       .catch((error) => {
-        dispatch(apiFail(error.response.data));
+        dispatch(apiFail(error.response));
       });
   };
 };
@@ -184,7 +185,8 @@ export const updateElement = (operationType, articleID, payload, token, pageConf
       })
 
       .catch((error) => {
-        dispatch(apiFail(error.response.data));
+        console.log("Error: ", error)
+        dispatch(apiFail(error.response));
       });
   };
 };
@@ -249,7 +251,7 @@ export const getTotals = (token) => {
       })
 
       .catch((error) => {
-        dispatch(apiFail(error.response.data));
+        dispatch(apiFail(error.response));
       });
   };
 };
@@ -276,7 +278,7 @@ export const getEarnings = (token, payload) => {
       })
 
       .catch((error) => {
-        dispatch(apiFail(error.response.data));
+        dispatch(apiFail(error.response));
       });
   };
 };

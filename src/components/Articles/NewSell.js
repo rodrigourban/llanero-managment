@@ -14,7 +14,7 @@ const NewSell = () => {
   const [data, setData] = React.useState(null);
   const dispatch = useDispatch();
   const pagination = useSelector((state) => state.api.pagination);
-  const order = useSelector((state) => state.api.order);
+  const ordering = useSelector((state) => state.api.order);
   const filter = useSelector((state) => state.api.filter);
 
   if (dataList.results[payload.key] && !data) {
@@ -35,7 +35,7 @@ const NewSell = () => {
       article: payload.id,
       location,
     };
-    dispatch(createSale(formatedValues, token));
+    dispatch(createSale(formatedValues, token, {pagination, order:ordering, filter}));
     if (order) {
       dispatch(
         createOrder(
