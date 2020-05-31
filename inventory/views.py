@@ -24,10 +24,8 @@ User = get_user_model()
 
 
 def search_many_words(words):
-    print(words)
     queryset = Article.objects.filter(
         reduce(operator.and_, (Q(name__icontains=x) for x in words)))
-    print(queryset.count())
     return queryset
 
 
@@ -49,7 +47,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
             queryset = search_many_words(search.split())
         else:
             queryset = Article.objects.filter(status=True)
-        return queryset.order_by('%s%s' % (orderType, orderField))
+        return queryset.order_by(f'{orderType}{orderField}')
 
     def create(self, request, *args, **kwargs):
         try:
@@ -102,7 +100,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
         try:
             views_logger.info("START PARTIAL UPDATE ARTICLE")
             payload = request.data
-            views_logger.info("%s", payload)
+            views_logger.info(f"{payload}")
             payload['updated_by'] = self.request.user.pk
             if 'location' in payload.keys():
                 views_logger.info("Actualizando las ubicacion")
@@ -154,6 +152,24 @@ class StockViewSet(viewsets.ModelViewSet):
             return Response(serializerStock.data)
         except ValidationError as error:
             views_logger.error("ERROR WHILE CREATING ARTICLE %s", error)
+            return Response({'message': error.as_json}, status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, pk=None):
+        try:
+            views_logger.info("START PARTIAL UPDATE STOCK")
+            payload = request.data
+            views_logger.info("%s", payload)
+            payload['updated_by'] = self.request.user.pk
+            stock = Stock.objects.get(id=pk)
+            serializer = StockSerializer(
+                stock, data=payload, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            views_logger.info("STOCK UPDATED SUCCESSFULLY")
+            views_logger.info(serializer.data)
+            return Response(serializer.data)
+        except ValidationError as error:
+            views_logger.error("ERROR WHILE UPDATING STOCK %s" % error)
             return Response({'message': error.as_json}, status.HTTP_400_BAD_REQUEST)
 
 
@@ -227,11 +243,6 @@ class SaleViewSet(viewsets.ModelViewSet):
                     sale_serializer.save()
                     stock_serializer.save()
                     i += 1
-                article = Article.objects.get(pk=self.request.data['article'])
-                new_quantity = Stock.objects.filter(article=article, status=True).aggregate(
-                    total_stock=Sum('quantity'))['total_stock']
-                article.quantity = new_quantity
-                article.save()
             else:
                 views_logger.info("CANT CREATE SALE, NOT ENOUGH STOCK")
                 return Response({'message': 'No hay stock suficiente.'}, status.HTTP_400_BAD_REQUEST)
@@ -292,9 +303,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         if (orderField == 'name' or orderField == '-name'):
             orderField = 'article__name'
         queryset = Order.objects.filter(status=True, state__icontains=search).order_by(
-            '%s%s' % (orderType, orderField)) | Order.objects.filter(status=True, body__icontains=search).order_by(
+            '%s%s' % (orderType, orderField)) | Order.objects.filter(
+            status=True,
+            article__name__icontains=search).order_by(
             '%s%s' % (orderType, orderField))
-        return queryset
+        return queryset.exclude(state='BORRADO').exclude(state='LLEGO')
 
     def create(self, request, *args, **kwargs):
         try:
@@ -438,6 +451,9 @@ class getEarnings(APIView):
             return Response({'message': error.message}, status.HTTP_400_BAD_REQUEST)
 
 
+# espejos con direccional led black  # Esta buggeado
+
+
 class transferStock(APIView):
     def post(self, request, format=None):
         try:
@@ -445,13 +461,27 @@ class transferStock(APIView):
                     or 'destination' not in request.data.keys() \
                     or 'quantity' not in request.data.keys():
                 raise ValidationError("Please provide dateFrom and dateTo")
+            """
+            THIS NEEDS REFACTOR ASAP
+            params:
+                    origin - id from the origin location
+                    destination - id from the destination location
+                    quantity - quantity to transfer
+            expected:
+                    Get all origin stock that are active
+                    Create new stock with the quantity and the cost from origin
+            """
             origin = self.request.data.get('origin', None)
             destination = self.request.data.get('destination', None)
             quantity = self.request.data.get('quantity', None)
             # Add in destination
-            stock_origin = Stock.objects.filter(location=origin, status=True)
+            # Get all stock of a location
+            origin_location = Location.objects.get(pk=origin)
+            stock_origin = origin_location.stock_location.all()
+            for i in stock_origin:
+                print(i.quantity)
             destination_serializer = StockSerializer(data={
-                'article': stock_origin[0].article.pk,
+                'article': origin_location.article.pk,
                 'location': destination,
                 'quantity': quantity,
                 'cost': stock_origin[0].cost,
@@ -463,6 +493,9 @@ class transferStock(APIView):
             # Delete in origin
             i = 0
             while quantity > 0:
+                if stock_origin[i].quantity <= 0:
+                    i += 1
+                    continue
                 new_quantity = stock_origin[i].quantity - quantity
                 stock_payload = {'quantity': new_quantity,
                                  'updated_by': self.request.user.pk}

@@ -77,7 +77,7 @@ const ArticleForm = () => {
       layout="vertical"
       initialValues={article && data ? data : null}
     >
-      {article ? <h2>Editar articulo</h2> : <h2>Agregar articulo nuevo</h2>}
+      <h2>{article ? 'Editar articulo' : 'Agregar articulo nuevo'}</h2>
       <Form.Item
         label="Nombre"
         name="name"

@@ -6,9 +6,11 @@ import * as apiActions from "../../store/actions/api";
 import "../../components/Table.scss";
 import "./inventory.css";
 
+
 const Inventory = (props) => {
   const [content, setContent] = React.useState([]);
   const [timeout, setTimeo] = React.useState(null);
+  const [searchInput, setSearchInput] = React.useState(localStorage.getItem('filter') || null);
   const filter = useSelector((state) => state.api.filter);
   const pagination = useSelector((state) => state.api.pagination);
   const order = useSelector((state) => state.api.order);
@@ -131,6 +133,7 @@ const Inventory = (props) => {
   };
 
   const onSearchChanged = (value) => {
+    setSearchInput(value);
     if (timeout) {
       clearTimeout(timeout);
     }
@@ -149,7 +152,7 @@ const Inventory = (props) => {
   const changeQueryParams = (field, value) => {
     switch (field) {
       case "search":
-        dispatch(apiActions.updatePagination(null));
+        dispatch(apiActions.updatePagination(''));
         dispatch(apiActions.updateFilter(value));
         break;
       case "pagination":
@@ -178,7 +181,7 @@ const Inventory = (props) => {
 
   return (
     <>
-      <Input.Search onChange={(e) => onSearchChanged(e.target.value)} />
+      <Input.Search onChange={(e) => onSearchChanged(e.target.value)} value={searchInput}/>
       <Table
         dataSource={content} //Table content>
         rowKey="id"
@@ -195,7 +198,7 @@ const Inventory = (props) => {
         />
         <Table.Column title="SKU" dataIndex="sku" key="sku" sorter={true} />
         <Table.Column title="Ubicacion" dataIndex="locations" key="locations" />
-        {admin ? (
+        {admin === true ? (
           <Table.Column title="Costo" dataIndex="cost" key="cost" />
         ) : null}
         <Table.Column
@@ -217,21 +220,21 @@ const Inventory = (props) => {
             />
           )}
         />
-        {admin ? (
+        {admin === true ? (
           <Table.Column title="Acciones" dataIndex="actions" key="actions" />
         ) : null}
       </Table>
-      {admin ? (
+      {admin === true ? (
         <div>
           Stock total: {stockPage} / {stockTotal}
         </div>
       ) : null}
-      {admin ? (
+      {admin === true ? (
         <div>
           Precio total: ${totalPrice} / ${priceTotal}
         </div>
       ) : null}
-      {admin ? (
+      {admin === true ? (
         <span
           onClick={() => dispatch(modalActions.modalOpen(1))}
           className="floatingBtn"

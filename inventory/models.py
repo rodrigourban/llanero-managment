@@ -19,7 +19,7 @@ class Article(models.Model):
     status = models.BooleanField(default=True)
     image = models.ImageField(upload_to='images', default='default.png')
     link = models.CharField(max_length=200, default="", blank=True)
-    quantity = models.IntegerField(blank=True, default=0)
+    quantity = models.PositiveIntegerField(blank=True, default=0, db_index=True)
     created_at = models.DateTimeField(default=datetime.now, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(

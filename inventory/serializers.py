@@ -21,7 +21,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ArticleSerializer(serializers.ModelSerializer):
     cost = serializers.SerializerMethodField('get_cost')
-    quantity = serializers.SerializerMethodField('get_stock')
     stock_list = serializers.SerializerMethodField('get_stock_list')
     location = serializers.SerializerMethodField('get_location')
 
@@ -41,14 +40,6 @@ class ArticleSerializer(serializers.ModelSerializer):
         if stock.count() >= 1:
             count = stock[0].cost
         return count
-
-    def get_stock(self, obj):
-        res = Stock.objects.filter(article=obj.pk, status=True).aggregate(
-            article_total_stock=Sum('quantity'))
-        stock = 0
-        if res['article_total_stock']:
-            stock = res['article_total_stock']
-        return stock
 
     def get_stock_list(self, obj):
         stock = Stock.objects.filter(article=obj.pk, status=True)

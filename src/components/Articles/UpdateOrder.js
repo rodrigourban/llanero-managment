@@ -13,7 +13,7 @@ const UpdateOrder = () => {
   const filter = useSelector((state) => state.api.filter);
 
   const handleSubmit = (values) => {
-    dispatch(updateElement(2, payload.id, values, {pagination, order, filter}));
+    dispatch(updateElement(2, payload.id, values, token, {pagination, order, filter}));
     dispatch(modalClose());
   };
 

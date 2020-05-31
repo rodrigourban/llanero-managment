@@ -181,7 +181,7 @@ export const updateElement = (operationType, articleID, payload, token, pageConf
         requestConfig
       )
       .then((res) => {
-        dispatch(getDataList(0, token, operationType, pageConfig));
+        dispatch(getDataList(0, token, operationType === 1 ? 0 : operationType, pageConfig));
       })
 
       .catch((error) => {
@@ -198,6 +198,7 @@ export const toggleSideDrawer = () => {
 };
 
 export const updateFilter = (filter) => {
+  localStorage.setItem('filter', filter);
   return {
     type: actionTypes.UPDATE_FILTER,
     filter,
@@ -205,6 +206,7 @@ export const updateFilter = (filter) => {
 };
 
 export const updatePagination = (pagination) => {
+  localStorage.setItem('pagination', pagination);
   return {
     type: actionTypes.UPDATE_PAGINATION,
     pagination,
@@ -212,6 +214,7 @@ export const updatePagination = (pagination) => {
 };
 
 export const updateOrder = (order) => {
+  localStorage.setItem('order', order);
   return {
     type: actionTypes.UPDATE_ORDER,
     order,

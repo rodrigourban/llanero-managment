@@ -1,11 +1,12 @@
 import React from "react";
 import { Form, InputNumber, Button, Select } from "antd";
 import { useSelector, useDispatch } from "react-redux";
-import { createStock } from "../../store/actions/api";
+import { createStock, updateElement } from "../../store/actions/api";
 import { modalClose } from "../../store/actions/modal";
 
-const NewStock = (props) => {
+const NewStock = () => {
   const payload = useSelector((state) => state.modal.payload);
+  const [existingStock, setExistingStock] = React.useState( null);
   const dataList = useSelector((state) => state.api.dataList);
   const token = useSelector((state) => state.auth.token);
   const pagination = useSelector((state) => state.api.pagination);
@@ -15,21 +16,37 @@ const NewStock = (props) => {
   const dispatch = useDispatch();
 
   const handleSubmit = (values) => {
-    if (payload) {
-      const data = { ...values, article: payload.id };
-      dispatch(createStock(data, token, {pagination, order, filter}));
-      dispatch(modalClose());
+    if (existingStock) {
+      const data = {...values}
+      delete data.location;
+      console.log("Editando stock: ", data);
+      dispatch(updateElement(1, existingStock.id, data, token, {pagination, order, filter}))
+    }else{
+    const data = { ...values, article: payload.id };
+    dispatch(createStock(data, token, {pagination, order, filter}));
     }
+    dispatch(modalClose());
   };
 
   if (dataList.results[payload.key] && !data) {
     setData(dataList.results[payload.key].location);
   }
 
+  if(typeof(payload.stock) !== 'undefined' && !existingStock){
+    const stock_obj = {
+      id: dataList.results[payload.key].stock_list[payload.stock].id,
+      location: dataList.results[payload.key].stock_list[payload.stock].location_name,
+      quantity: dataList.results[payload.key].stock_list[payload.stock].quantity,
+      cost: dataList.results[payload.key].stock_list[payload.stock].cost,
+    }
+    setExistingStock(stock_obj);
+    // console.log("payload", dataList.results[payload.key].stock_list[payload.stock]);
+  }
+
   return (
     <>
-      <h1>Agregar Stock</h1>
-      <Form onFinish={handleSubmit} layout="vertical">
+      <h1>{existingStock ? 'Editar stock' : 'Agregar Stock' }</h1>
+      <Form onFinish={handleSubmit} layout="vertical" initialValues={existingStock ? existingStock : null}>
         <Form.Item
           label="Ubicacion"
           name="location"
@@ -40,7 +57,7 @@ const NewStock = (props) => {
             },
           ]}
         >
-          <Select placeholder="Ubicacion">
+          <Select placeholder="Ubicacion" disabled={existingStock ? true : false}>
             {data
               ? data.map((item, key) => (
                   <Select.Option value={item.id} key={key}>
@@ -86,7 +103,7 @@ const NewStock = (props) => {
 
         <Form.Item>
           <Button type="primary" htmlType="submit">
-            Crear
+            { existingStock ? 'Editar' : 'Crear' }
           </Button>
         </Form.Item>
       </Form>
